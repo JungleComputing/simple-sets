@@ -1,0 +1,64 @@
+#+property: header-args :comments link :tangle-mode (identity #o400) :results output silent :mkdirp yes
+
+* Setting up the system
+
+#+begin_src lisp :tangle "system/simple-sets.asd" :mkdirp yes
+(in-package :cl-user)
+
+(defpackage :simple-sets-asd
+  (:use :cl :asdf))
+
+(in-package :simple-sets-asd)
+
+(defsystem :simple-sets
+  :depends-on (:alexandria)
+  :components ((:file "packages")
+               (:file "relations"
+                      :depends-on ("packages"))
+               (:file "sets"
+                      :depends-on ("packages"))))
+#+end_src
+
+#+begin_src lisp :tangle no
+(defsystem :simple-sets/tests
+  :components ((:file "packages")
+               (:file "relations"
+                      :depends-on ("packages"))
+               (:file "sets"
+                      :depends-on ("packages"))
+               (:file "test-sets"
+                      :depends-on ("packages" "macros" "sets"))
+               (:file "test-relations"
+                      :depends-on ("packages" "macros" "sets" "relations"))))
+#+end_src
+
+#+begin_src lisp :tangle "system/packages.lisp" :mkdirp yes
+(in-package :cl-user)
+
+(defpackage :simple-sets
+     (:use :cl)
+     (:shadow :union :set-difference :intersection)
+     (:export :add-to-rel
+	      :add-tuple-to-rel
+	      :subscribe-rel
+	      :make-relation
+	      :simple-set
+	      :set=
+	      :add-to-set
+	      :remove-from-set
+	      :add-all-to-set
+	      :elements
+	      :make-set
+	      :copy-set
+	      :difference
+	      :union
+	      :intersection
+	      :contains-p
+	      :size-set
+	      :empty-set-p
+	      :get-element-set))
+
+;; (defpackage :test-util
+;;   (:use :cl :test-framework :cl-graph :util :alexandria)
+;;   (:export :test-util))
+#+end_src

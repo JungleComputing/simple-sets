@@ -1,0 +1,76 @@
+#+property: header-args :comments link :tangle-mode (identity #o400) :results output silent :mkdirp yes
+
+#+title: Simple Sets
+
+ # tangling
+
+#+begin_src emacs-lisp :exports none :results output silent
+(async-start
+ (lambda ()
+   (require 'org)
+   (require 'ob)
+   (require 'ob-tangle)
+   (let ((files '("main.org" "system-definition.org" "sets.org"
+		  "relations.org")))
+     (mapc (lambda (file)
+	     (find-file file)
+	     (let ((result (org-babel-tangle)))
+	       (kill-buffer)
+	       result))
+	   files)))
+ (lambda (result)
+   (message "Done with tangling %s." (mapconcat 'identity result " "))))
+(princ "Busy with tangling")
+#+end_src
+
+
+#+begin_src emacs-lisp :exports none :results output silent
+(defun export ()
+  (require 'package)
+  (package-initialize)
+  (require 'org)
+  (require 'ob)
+  (require 'htmlize)
+  (find-file "main.org")
+  (unless (file-exists-p "html")
+    (mkdir "html"))
+  (org-html-export-as-html)
+  (write-file "html/main.html")
+  (kill-buffer))
+
+(defun msg-me (process event)
+  (when (equal event "finished\n")
+    (message "Exporting to HTML done")
+    (kill-buffer "*html-export*")))
+
+(progn
+  (set-process-sentinel
+   (start-process-shell-command
+    "html-export" "*html-export*"
+    (format "TERM=xterm-256color;emacs -Q -nw --eval '(progn (funcall %S) (kill-emacs))';exit"
+	    (symbol-function 'export))) 'msg-me)
+  (princ "Busy exporting to HTML"))
+#+end_src
+
+
+
+
+ # clean
+#+begin_src sh :exports none :results output silent :shebang #!/bin/sh
+/bin/rm -rf html
+/bin/rm -rf system
+#+end_src
+
+* Introduction
+
+The ~simple-sets~ package provides a very simple interface to sets and
+relations.  A set is in essence a list and can be operated on in the same way
+as lists with ~union~, ~adjoin~, etc.  However, when making sets, one specifies
+the test function.  In essence, the only goal of this library is to make sets
+available in such a way that you don't have to specify the test function all
+the time.  
+
+# #+include: "system-definition.org" :minlevel 1
+#+include: "sets.org" :minlevel 1
+#+include: "relations.org" :minlevel 1
+

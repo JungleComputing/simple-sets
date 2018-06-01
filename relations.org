@@ -1,0 +1,76 @@
+#+property: header-args :comments link :tangle-mode (identity #o400) :results output silent :mkdirp yes
+
+* Relations
+  :PROPERTIES:
+  :header-args+: :package ":simple-sets"
+  :header-args+: :tangle "system/relations.lisp"
+  :END:
+
+#+begin_src lisp :exports none
+(in-package :simple-sets)
+#+end_src
+
+Relations form a small extension to sets.  It is simply a tuple that is
+represented by a ~cons~ that is added to a set.  Again, it is necessary to
+provide a ~test~ function.
+
+#+begin_src lisp
+(defclass simple-relation (simple-set) ())
+
+(defun make-relation (&key (test #'equal))
+  (make-instance 'simple-relation :test test))
+#+end_src
+
+We defined the following generic functions on relations:
+
+#+begin_src lisp
+(defgeneric add-to-rel (a b relation)
+  (:documentation "Make a tuple of a and b and add it to the relation."))
+(defgeneric add-tuple-to-rel (tuple relation)
+  (:documentation "Add tuple to the relation."))
+(defgeneric subscribe-rel (key relation)
+  (:documentation "Get the set of values that relate to key."))
+#+end_src
+
+The implementation:
+
+#+begin_src lisp
+(defmethod add-to-rel (a b (relation simple-relation))
+  (add-tuple-to-rel (cons a b) relation))
+
+(defmethod add-tuple-to-rel (tuple (relation simple-relation))
+  (add-to-set tuple relation))
+
+(defmethod subscribe-rel (key (relation simple-relation))
+  (with-slots (elements test) relation
+    (let ((set (make-set :test test)))
+      (add-all-to-set
+       (mapcar #'cdr 
+	       (remove-if-not (complement #'(lambda (x) (funcall test (car x) key))) elements)) set)
+      set)))
+#+end_src
+
+* Testing relations :noexport:
+   :PROPERTIES:
+   :header-args+: :package ":test-util"
+#    :header-args+: :tangle "system/test-relations.lisp"
+   :header-args+: :tangle no
+   :END:
+
+#+begin_src lisp
+(in-package :test-util)
+
+(deftest test-subscription ()
+  (let ((relation (make-relation))
+	(result (make-set :test #'equal)))
+    (add-to-rel 1 2 relation)
+    (add-tuple-to-rel '(1 . 3) relation)
+    (add-to-rel 2 4 relation)
+    (add-to-set 3 result)
+    (add-to-set 2 result)
+    (check (set= (subscribe-rel 1 relation) result))))
+
+(deftest test-relations ()
+  (combine-results 
+    (test-subscription)))
+#+end_src

@@ -1,0 +1,171 @@
+#+property: header-args :comments link :tangle-mode (identity #o400) :results output silent :mkdirp yes
+
+* Sets
+  :PROPERTIES:
+  :header-args+: :package ":simple-sets"
+  :header-args+: :tangle "system/sets.lisp"
+  :END:
+
+
+#+begin_src lisp :exports none
+(in-package :simple-sets)
+#+end_src
+
+A simple set is represented by lists and it needs a test function to test for equality.
+
+#+begin_src lisp
+(defclass simple-set ()
+  ((elements :initarg :elements :initform nil :accessor elements)
+   (test :initarg :test :initform (error "must supply test function")
+	 :reader test))
+  (:documentation "Represents a set with lists.  It needs a test function to compare elements."))
+
+(defun make-set (&key (test #'eq) (elements nil))
+  "Make a new set"
+  (make-instance 'simple-set :test test :elements elements))
+
+(defun copy-set (set &key (copy-value #'identity))
+  "Copies a set to a new set."
+  (make-set :test (test set) :elements (mapcar copy-value (elements set))))
+#+end_src
+
+The following generic functions are defined in this package to manipulate sets:
+
+#+begin_src lisp
+(defgeneric set= (set-1 set-2)
+  (:documentation "Tests whether sets are equal according to the equality 
+functions of the sets (that have to be equal)."))
+
+(defgeneric add-to-set (element set)
+  (:documentation "Add an element to a set."))
+
+(defgeneric remove-from-set (element set)
+  (:documentation "Remove an element from a set."))
+
+(defgeneric add-all-to-set (elements set)
+  (:documentation "Add all elements to a set."))
+
+(defgeneric union (set1 set2)
+  (:documentation "Take the union of the two sets."))
+
+(defgeneric difference (set1 set2)
+  (:documentation "Take the difference of the two sets."))
+
+(defgeneric intersection (set1 set2)
+  (:documentation "Take the intersection of the two sets."))
+
+(defgeneric contains-p (set element)
+  (:documentation "Whether element is contained in the set."))
+
+(defgeneric size-set (set)
+  (:documentation "Returns the size of a set."))
+
+(defgeneric empty-set-p (set)
+  (:documentation "Returns whether the set is empty."))
+
+(defgeneric get-element-set (set)
+  (:documentation "Returns a random element from set."))
+#+end_src
+
+Below, we find the implementations for ~simple-set~:
+
+#+begin_src lisp
+(defmethod set= ((s1 simple-set) (s2 simple-set))
+  (with-slots ((elements-1 elements) (test-1 test)) s1
+    (with-slots ((elements-2 elements) (test-2 test)) s2
+      (assert (eq test-1 test-2))
+      (null (set-exclusive-or elements-1 elements-2 :test test-1)))))
+
+(defmethod add-to-set (element (set simple-set))
+  (with-slots (elements test) set
+    (pushnew element elements :test test)))
+
+(defmethod remove-from-set (element (set simple-set))
+  (with-slots (elements test) set
+    (alexandria:removef elements element :test test)))
+
+(defmethod add-all-to-set ((elements list) (s simple-set))
+  (dolist (i elements)
+    (add-to-set i s)))
+
+(defmethod union ((s1 simple-set) (s2 simple-set))
+  (with-slots ((elements-1 elements) (test-1 test)) s1
+    (with-slots ((elements-2 elements) (test-2 test)) s2
+      (assert (eq test-1 test-2))
+      (make-set :test test-1 :elements (union elements-1 elements-2
+					      :test test-1)))))
+
+(defmethod set-difference ((s1 simple-set) (s2 simple-set))
+  (with-slots ((elements-1 elements) (test-1 test)) s1
+    (with-slots ((elements-2 elements) (test-2 test)) s2
+      (assert (eq test-1 test-2))
+      (make-set :test test-1
+		:elements (set-difference elements-1
+					  elements-2 :test test-1)))))
+
+(defmethod intersection ((s1 simple-set) (s2 simple-set))
+  (with-slots ((elements-1 elements) (test-1 test)) s1
+    (with-slots ((elements-2 elements) (test-2 test)) s2
+      (assert (eq test-1 test-2))
+      (make-set :test test-1
+		:elements (intersection elements-1
+					elements-2 :test test-1)))))
+
+(defmethod contains-p ((s simple-set) element)
+  (with-slots (elements test) s
+    (member element elements :test test)))
+
+(defmethod size-set ((s simple-set))
+  (length (elements s)))
+
+(defmethod empty-set-p ((s simple-set))
+  (eql (size-set s) 0))
+
+(defmethod get-element-set ((s simple-set))
+  (first (elements s)))
+
+(defmethod print-object ((s simple-set) stream)
+  (print-unreadable-object (s stream :type t)
+    (format stream "{~{~a~^, ~}}" (elements s))))
+#+end_src
+
+* Testing sets :noexport:
+  :PROPERTIES:
+   :header-args+: :package ":test-util"
+#    :header-args+: :tangle "system/test-sets.lisp"
+   :header-args+: :tangle no
+   :END:
+
+#+begin_src lisp
+(in-package :test-util)
+
+(deftest test-equal-tuple ()
+  (let ((s-1 (make-set :test #'equal))
+	(s-2 (make-set :test #'equal)))
+    (add-to-set '(1 . 2) s-1)
+    (add-to-set '(2 . 3) s-1)
+    (add-to-set '(2 . 3) s-2)
+    (add-to-set '(1 . 2) s-2)
+    (check
+     (set= s-1 s-2))))
+
+
+(deftest test-equal-number ()
+  (let ((s-1 (make-set))
+	(s-2 (make-set)))
+    (add-to-set 1 s-1)
+    (add-to-set 2 s-1)
+    (add-to-set 2 s-2)
+    (add-to-set 1 s-2)
+    (check 
+     (set= s-1 s-2))))
+
+(deftest test-equal ()
+  (combine-results
+   (test-equal-number)
+   (test-equal-tuple)))
+
+(deftest test-sets ()
+  (combine-results
+    (test-equal)))
+#+end_src

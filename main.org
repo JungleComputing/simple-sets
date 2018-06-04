@@ -2,7 +2,7 @@
 
 #+title: Simple Sets
 
- # tangling
+* tangling :noexport:
 
 #+begin_src emacs-lisp :exports none :results output silent
 (async-start
@@ -23,6 +23,7 @@
 (princ "Busy with tangling")
 #+end_src
 
+* exporting to html :noexport:
 
 #+begin_src emacs-lisp :exports none :results output silent
 (defun export ()
@@ -52,10 +53,8 @@
   (princ "Busy exporting to HTML"))
 #+end_src
 
+* cleaning :noexport:
 
-
-
- # clean
 #+begin_src sh :exports none :results output silent :shebang #!/bin/sh
 /bin/rm -rf html
 /bin/rm -rf system

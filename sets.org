@@ -3,7 +3,7 @@
 * Sets
   :PROPERTIES:
   :header-args+: :package ":simple-sets"
-  :header-args+: :tangle "system/sets.lisp"
+  :header-args+: :tangle "system/main/sets.lisp"
   :END:
 
 
@@ -129,43 +129,36 @@ Below, we find the implementations for ~simple-set~:
     (format stream "{~{~a~^, ~}}" (elements s))))
 #+end_src
 
-* Testing sets :noexport:
+* Testing sets
   :PROPERTIES:
-   :header-args+: :package ":test-util"
-#    :header-args+: :tangle "system/test-sets.lisp"
-   :header-args+: :tangle no
-   :END:
+  :header-args+: :package ":test-simple-sets"
+  :header-args+: :tangle "system/test/test-sets.lisp"
+  :END:
 
 #+begin_src lisp
-(in-package :test-util)
+(in-package :test-simple-sets)
 
-(deftest test-equal-tuple ()
+(def-suite simple-sets)
+(in-suite simple-sets)
+
+(test equal-tuple
   (let ((s-1 (make-set :test #'equal))
 	(s-2 (make-set :test #'equal)))
     (add-to-set '(1 . 2) s-1)
     (add-to-set '(2 . 3) s-1)
     (add-to-set '(2 . 3) s-2)
     (add-to-set '(1 . 2) s-2)
-    (check
-     (set= s-1 s-2))))
+    (is (set= s-1 s-2))))
 
-
-(deftest test-equal-number ()
+(test equal-number
   (let ((s-1 (make-set))
 	(s-2 (make-set)))
     (add-to-set 1 s-1)
     (add-to-set 2 s-1)
     (add-to-set 2 s-2)
     (add-to-set 1 s-2)
-    (check 
-     (set= s-1 s-2))))
+    (is (set= s-1 s-2))))
 
-(deftest test-equal ()
-  (combine-results
-   (test-equal-number)
-   (test-equal-tuple)))
-
-(deftest test-sets ()
-  (combine-results
-    (test-equal)))
+(defun test-simple-sets ()
+  (run! 'simple-sets))
 #+end_src

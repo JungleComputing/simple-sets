@@ -2,7 +2,7 @@
 
 * Setting up the system
 
-#+begin_src lisp :tangle "system/simple-sets.asd" :mkdirp yes
+#+begin_src lisp :tangle "system/main/simple-sets.asd"
 (in-package :cl-user)
 
 (defpackage :simple-sets-asd
@@ -12,27 +12,24 @@
 
 (defsystem :simple-sets
   :depends-on (:alexandria)
-  :components ((:file "packages")
+  :components ((:file "package")
                (:file "relations"
-                      :depends-on ("packages"))
+                      :depends-on ("package"))
                (:file "sets"
-                      :depends-on ("packages"))))
+                      :depends-on ("package"))))
 #+end_src
 
-#+begin_src lisp :tangle no
+#+begin_src lisp :tangle "system/test/simple-sets.asd"
 (defsystem :simple-sets/tests
-  :components ((:file "packages")
-               (:file "relations"
-                      :depends-on ("packages"))
-               (:file "sets"
-                      :depends-on ("packages"))
+  :depends-on (:fiveam)
+  :components ((:file "package")
                (:file "test-sets"
-                      :depends-on ("packages" "macros" "sets"))
+                      :depends-on ("package"))
                (:file "test-relations"
-                      :depends-on ("packages" "macros" "sets" "relations"))))
+                      :depends-on ("package" "test-sets"))))
 #+end_src
 
-#+begin_src lisp :tangle "system/packages.lisp" :mkdirp yes
+#+begin_src lisp :tangle "system/main/package.lisp"
 (in-package :cl-user)
 
 (defpackage :simple-sets
@@ -57,8 +54,11 @@
 	      :size-set
 	      :empty-set-p
 	      :get-element-set))
+#+end_src
 
-;; (defpackage :test-util
-;;   (:use :cl :test-framework :cl-graph :util :alexandria)
-;;   (:export :test-util))
+#+begin_src lisp :tangle "system/test/package.lisp"
+(defpackage :test-simple-sets
+  (:use :cl :fiveam :simple-sets)
+  (:shadowing-import-from :simple-sets :union :set-difference :intersection)
+  (:export :test-simple-sets))
 #+end_src

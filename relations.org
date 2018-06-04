@@ -3,7 +3,7 @@
 * Relations
   :PROPERTIES:
   :header-args+: :package ":simple-sets"
-  :header-args+: :tangle "system/relations.lisp"
+  :header-args+: :tangle "system/main/relations.lisp"
   :END:
 
 #+begin_src lisp :exports none
@@ -18,6 +18,7 @@ provide a ~test~ function.
 (defclass simple-relation (simple-set) ())
 
 (defun make-relation (&key (test #'equal))
+  "Make a relation with test function test that is #'equal by default."
   (make-instance 'simple-relation :test test))
 #+end_src
 
@@ -46,21 +47,22 @@ The implementation:
     (let ((set (make-set :test test)))
       (add-all-to-set
        (mapcar #'cdr 
-	       (remove-if-not (complement #'(lambda (x) (funcall test (car x) key))) elements)) set)
+	       (remove-if (complement #'(lambda (x) (funcall test (car x) key))) elements)) set)
       set)))
 #+end_src
 
-* Testing relations :noexport:
-   :PROPERTIES:
-   :header-args+: :package ":test-util"
-#    :header-args+: :tangle "system/test-relations.lisp"
-   :header-args+: :tangle no
-   :END:
+* Testing relations
+  :PROPERTIES:
+  :header-args+: :package ":test-simple-sets"
+  :header-args+: :tangle "system/test/test-relations.lisp"
+  :END:
 
 #+begin_src lisp
-(in-package :test-util)
+(in-package :test-simple-sets)
 
-(deftest test-subscription ()
+(in-suite simple-sets)
+
+(test subscription
   (let ((relation (make-relation))
 	(result (make-set :test #'equal)))
     (add-to-rel 1 2 relation)
@@ -68,9 +70,5 @@ The implementation:
     (add-to-rel 2 4 relation)
     (add-to-set 3 result)
     (add-to-set 2 result)
-    (check (set= (subscribe-rel 1 relation) result))))
-
-(deftest test-relations ()
-  (combine-results 
-    (test-subscription)))
+    (is (set= (subscribe-rel 1 relation) result))))
 #+end_src

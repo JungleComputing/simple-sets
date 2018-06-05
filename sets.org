@@ -92,7 +92,7 @@ Below, we find the implementations for ~simple-set~:
   (with-slots ((elements-1 elements) (test-1 test)) s1
     (with-slots ((elements-2 elements) (test-2 test)) s2
       (assert (eq test-1 test-2))
-      (make-set :test test-1 :elements (union elements-1 elements-2
+      (make-set :test test-1 :elements (cl:union elements-1 elements-2
 					      :test test-1)))))
 
 (defmethod set-difference ((s1 simple-set) (s2 simple-set))
@@ -100,7 +100,7 @@ Below, we find the implementations for ~simple-set~:
     (with-slots ((elements-2 elements) (test-2 test)) s2
       (assert (eq test-1 test-2))
       (make-set :test test-1
-		:elements (set-difference elements-1
+		:elements (cl:set-difference elements-1
 					  elements-2 :test test-1)))))
 
 (defmethod intersection ((s1 simple-set) (s2 simple-set))
@@ -108,7 +108,7 @@ Below, we find the implementations for ~simple-set~:
     (with-slots ((elements-2 elements) (test-2 test)) s2
       (assert (eq test-1 test-2))
       (make-set :test test-1
-		:elements (intersection elements-1
+		:elements (cl:intersection elements-1
 					elements-2 :test test-1)))))
 
 (defmethod contains-p ((s simple-set) element)

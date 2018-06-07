@@ -1,8 +1,31 @@
+#+name: license-preamble
+#+begin_src lisp :exports none 
+;;;; Set interface based on lists.
+;;;; Copyright (C) 2018 Pieter Hijma
+
+;;;; This program is free software: you can redistribute it and/or modify
+;;;; it under the terms of the GNU General Public License as published by
+;;;; the Free Software Foundation, either version 3 of the License, or
+;;;; (at your option) any later version.
+
+;;;; This program is distributed in the hope that it will be useful,
+;;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;;; GNU General Public License for more details.
+
+;;;; You should have received a copy of the GNU General Public License
+;;;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#+end_src
+
 #+property: header-args :comments link :tangle-mode (identity #o400) :results output silent :mkdirp yes
 
 * Setting up the system
 
-#+begin_src lisp :tangle "system/main/simple-sets.asd"
+
+
+#+begin_src lisp :tangle "system/main/simple-sets.asd" :noweb yes
+<<license-preamble>>
+
 (in-package :cl-user)
 
 (defpackage :simple-sets-asd
@@ -19,7 +42,9 @@
                       :depends-on ("package"))))
 #+end_src
 
-#+begin_src lisp :tangle "system/test/simple-sets.asd"
+#+begin_src lisp :tangle "system/test/simple-sets.asd" :noweb yes
+<<license-preamble>>
+
 (defsystem :simple-sets/tests
   :depends-on (:fiveam)
   :components ((:file "package")
@@ -29,7 +54,9 @@
                       :depends-on ("package" "test-sets"))))
 #+end_src
 
-#+begin_src lisp :tangle "system/main/package.lisp"
+#+begin_src lisp :tangle "system/main/package.lisp" :noweb yes
+<<license-preamble>>
+
 (in-package :cl-user)
 
 (defpackage :simple-sets
@@ -56,7 +83,9 @@
 	      :get-element-set))
 #+end_src
 
-#+begin_src lisp :tangle "system/test/package.lisp"
+#+begin_src lisp :tangle "system/test/package.lisp" :noweb yes
+<<license-preamble>>
+
 (defpackage :test-simple-sets
   (:use :cl :fiveam :simple-sets)
   (:shadowing-import-from :simple-sets :union :set-difference :intersection)

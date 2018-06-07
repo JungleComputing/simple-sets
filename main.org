@@ -1,3 +1,19 @@
+# Set interface based on lists.
+# Copyright (C) 2018 Pieter Hijma
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #+property: header-args :comments link :tangle-mode (identity #o400) :results output silent :mkdirp yes
 
 #+title: Simple Sets
@@ -67,9 +83,27 @@ relations.  A set is in essence a list and can be operated on in the same way
 as lists with ~union~, ~adjoin~, etc.  However, when making sets, one specifies
 the test function.  In essence, the only goal of this library is to make sets
 available in such a way that you don't have to specify the test function all
-the time.  
+the time.  The code has been released under the GPLv3 license, see
+Sec. [[copying]].
 
 # #+include: "system-definition.org" :minlevel 1
 #+include: "sets.org" :minlevel 1
 #+include: "relations.org" :minlevel 1
 
+* Copying <<copying>>
+
+Set interface based on lists.
+Copyright (C) 2018 Pieter Hijma
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.

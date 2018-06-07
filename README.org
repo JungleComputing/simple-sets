@@ -1,0 +1,21 @@
+#+title: Simple Sets
+
+* Introduction
+
+This Common Lisp ~simple-sets~ package provides a very simple interface to sets
+and relations.  A set is in essence a list and can be operated on in the same
+way as lists with ~union~, ~adjoin~, etc.  However, when making sets, one
+specifies the test function.  In essence, the only goal of this library is to
+make sets available in such a way that you don't have to specify the test
+function all the time.  The source code has been provided as Org-mode files
+that also export to documentation.
+
+* License
+
+The code has been released under the GPLv3 license.
+
+* Copyright
+
+Pieter Hijma 2018
+
+
